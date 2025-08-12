@@ -1,5 +1,5 @@
 // src/pages/ResultPage.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function ResultPage() {
@@ -11,6 +11,7 @@ function ResultPage() {
   const memory = JSON.parse(localStorage.getItem("memoryResult") || "{}");
   const numbers = JSON.parse(localStorage.getItem("numbersResult") || "{}");
   const flexibility = JSON.parse(localStorage.getItem("flexibilityResult") || "{}");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
   const getSummary = () => {
     const score = [
@@ -24,6 +25,76 @@ function ResultPage() {
     if (score >= selectedTests.length / 2) return '🟡 평균 수준';
     return '🔴 주의 필요';
   };
+
+  const getUserId = () => {
+    let id = localStorage.getItem("userId");
+    if (!id) {
+      id = crypto.randomUUID(); // 최초 1회 생성
+      localStorage.setItem("userId", id);
+    }
+    return id;
+  };
+
+  // AWS로 결과 전송 (요약 → 히스토리)
+  useEffect(() => {
+    const API = "https://0jfcf61qse.execute-api.ap-northeast-2.amazonaws.com/prod/storeUserData";
+
+    const sendDataToAWS = async () => {
+      const payload = {
+        userId: getUserId(),                 // 항상 같은 userId로 덮어쓰기
+        name: userInfo.name ?? "unknown",
+        age: Number(userInfo.age ?? 0),
+        gender: userInfo.gender ?? "unknown",
+        results: {
+          reaction: reaction.avgTime ?? -1,
+          memory: memory.correctRate ?? -1,
+          numbers: numbers.correctRate ?? -1,
+          flexibility: {
+            correctRate: flexibility.correctRate ?? -1,
+            avgTime: flexibility.avgTime ?? -1
+          }
+        },
+        summary: getSummary()
+      };
+
+      try {
+        // 1) 요약 저장 (UserResults에 덮어쓰기)
+        const resSummary = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!resSummary.ok) {
+          const txt = await resSummary.text().catch(() => "");
+          throw new Error(`summary save failed: ${resSummary.status} ${txt}`);
+        }
+        const dataSummary = await resSummary.json();
+        console.log("AWS 요약 저장 응답:", dataSummary);
+      } catch (e) {
+        console.error("요약 저장 실패:", e);
+      }
+
+      try {
+        // 2) 히스토리 저장 (UserResultsHistory에 누적)
+        const resHistory = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...payload, mode: "history" }),
+        });
+        if (!resHistory.ok) {
+          const txt = await resHistory.text().catch(() => "");
+          throw new Error(`history save failed: ${resHistory.status} ${txt}`);
+        }
+        const dataHistory = await resHistory.json();
+        console.log("AWS 히스토리 저장 응답:", dataHistory);
+      } catch (e) {
+        console.error("히스토리 저장 실패:", e);
+      }
+    };
+
+    sendDataToAWS();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRestart = () => {
     localStorage.clear();

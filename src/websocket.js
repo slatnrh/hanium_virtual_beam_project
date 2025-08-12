@@ -1,26 +1,26 @@
 // src/websocket.js
 
 export function connectWebSocket(onMessage){
-  const socket = new WebSocket("ws://3.25.77.146:8765");
+  const ws = new WebSocket("ws://15.164.129.241:8080");
 
-  socket.onopen = () => {
+  ws.onopen = () => {
     console.log("WebSocket 연결됨");
   };
 
-  socket.onmessage = (event) => {
+  ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if(data.gesture){
       onMessage(data.gesture);
     }
   };
 
-  socket.onerror = (err) => {
+  ws.onerror = (err) => {
     console.error("WebSocket 오류:", err);
   };
 
-  socket.onclose = () => {
+  ws.onclose = () => {
     console.warn("WebSocket 연결 종료됨");
   };
 
-  return socket;
+  return ws;
 }
