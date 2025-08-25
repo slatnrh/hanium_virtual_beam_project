@@ -19,10 +19,10 @@ const shapeKoreanMap = {
   circle: '원',
 };
 
-function getRandomGrid() {
+function getRandomGrid(){
   const allCombinations = [];
-  for (let c of colors) {
-    for (let s of shapes) {
+  for(let c of colors){
+    for(let s of shapes){
       allCombinations.push({ color: c, shape: s });
     }
   }
@@ -32,14 +32,14 @@ function getRandomGrid() {
   const correctIndex = Math.floor(Math.random() * 9);
   const correctItem = grid[correctIndex];
 
-  return {
+  return{
     grid,
     correctIndex,
     correctItem,
   };
 }
 
-function SpatialMemoryPage() {
+function SpatialMemoryPage(){
   const [phase, setPhase] = useState('ready'); // ready | memorize | question | result
   const [gridData, setGridData] = useState([]);
   const [correctIndex, setCorrectIndex] = useState(null);
@@ -71,29 +71,32 @@ function SpatialMemoryPage() {
   };
 
   const handleClick = (idx) => {
-    if (phase !== 'question') return;
+    if(phase !== 'question') return;
 
     const time = Date.now() - startTime;
     const isCorrect = idx === correctIndex;
     const newResults = [...results, { isCorrect, time }];
     setResults(newResults);
 
-    if (newResults.length >= 5) {
+    if(newResults.length >= 5){
       setPhase('result');
       setMessage('테스트 완료!');
-    } else {
+    }
+    else{
       setPhase('ready');
       setMessage('다음 라운드를 시작하세요');
     }
   };
 
   const handleStart = () => {
-    if (phase === 'ready') {
+    if(phase === 'ready'){
       startRound();
-    } else if (phase === 'result') {
-      if (nextTest) {
+    }
+    else if(phase === 'result'){
+      if(nextTest){
         navigate(`/test/${nextTest}`);
-      } else {
+      }
+      else{
         navigate('/result');
       }
     }
@@ -104,46 +107,46 @@ function SpatialMemoryPage() {
     : 0;
 
   useEffect(() => {
-    if (phase === 'result') {
+    if(phase === 'result'){
       const memoryResult = { correctRate };
       localStorage.setItem("memoryResult", JSON.stringify(memoryResult));
     }
   }, [phase, correctRate]);
 
-  return (
-    <div style={styles.container}>
+  return(
+    <div style = {styles.container}>
       <h2>
         {phase === 'question' && correctItem
           ? `"${colorKoreanMap[correctItem.color]} ${shapeKoreanMap[correctItem.shape]}" 도형은 어디에 있었나요?`
           : message}
       </h2>
 
-      <div style={styles.grid}>
+      <div style = {styles.grid}>
         {gridData.map((item, idx) => (
-          <div key={idx} onClick={() => handleClick(idx)} style={styles.cell}>
+          <div key = {idx} onClick = {() => handleClick(idx)} style = {styles.cell}>
             {item?.shape === 'circle' && (
-              <div style={{ ...styles.circle, backgroundColor: item.color }} />
+              <div style = {{ ...styles.circle, backgroundColor: item.color }} />
             )}
             {item?.shape === 'square' && (
-              <div style={{ ...styles.square, backgroundColor: item.color }} />
+              <div style = {{ ...styles.square, backgroundColor: item.color }} />
             )}
             {item?.shape === 'triangle' && (
-              <div style={{ ...styles.triangle, borderBottomColor: item.color }} />
+              <div style = {{ ...styles.triangle, borderBottomColor: item.color }} />
             )}
           </div>
         ))}
       </div>
 
       {phase === 'ready' && (
-        <button onClick={handleStart} style={styles.button}>
+        <button onClick = {handleStart} style = {styles.button}>
           시작하기
         </button>
       )}
 
       {phase === 'result' && (
-        <div style={styles.resultBox}>
+        <div style = {styles.resultBox}>
           <p>정답률: {correctRate}%</p>
-          <button onClick={handleStart} style={styles.button}>
+          <button onClick = {handleStart} style = {styles.button}>
             {nextTest ? '다음 테스트 ▶' : '결과 보기 ▶'}
           </button>
         </div>

@@ -11,14 +11,14 @@ exports.handler = async (event) => {
   const method = (event.httpMethod || "GET").toUpperCase();
   const path = (event.resource || event.path || "").toLowerCase();
 
-  if (method === "OPTIONS") return resp(204, "");
+  if(method === "OPTIONS") return resp(204, "");
 
-  try {
-    if (method !== "POST") return resp(405, { error: "Use POST" });
+  try{
+    if(method !== "POST") return resp(405, { error: "Use POST" });
 
     const body = event.body ? JSON.parse(event.body) : {};
     const userId = String(body.userId || "");
-    if (!userId) return resp(400, { error: "userId 필수" });
+    if(!userId) return resp(400, { error: "userId 필수" });
 
     const common = {
       name: body.name ?? "unknown",
@@ -33,22 +33,22 @@ exports.handler = async (event) => {
     };
 
     // 🔀 분기: mode === "history" → 누적 저장, 그 외 → 요약 저장(덮어쓰기)
-    if (String(body.mode).toLowerCase() === "history") {
+    if(String(body.mode).toLowerCase() === "history"){
       const ts = Date.now();
       await client.send(new PutItemCommand({
         TableName: HISTORY_TABLE,
         Item: {
           UserID: { S: userId },
-          ts:     { N: String(ts) },      // SK
-          name:   { S: common.name },
-          age:    { N: String(common.age) },
+          ts: { N: String(ts) },      // SK
+          name: { S: common.name },
+          age: { N: String(common.age) },
           gender: { S: common.gender },
-          summary:{ S: common.summary },
+          summary: { S: common.summary },
           reaction: { N: String(common.reaction) },
-          memory:   { N: String(common.memory) },
-          numbers:  { N: String(common.numbers) },
+          memory: { N: String(common.memory) },
+          numbers: { N: String(common.numbers) },
           flexibility_correctRate: { N: String(common.flexRate) },
-          flexibility_avgTime:     { N: String(common.flexAvg) }
+          flexibility_avgTime: { N: String(common.flexAvg) }
         }
       }));
       return resp(200, { ok: true, where: "history" });
@@ -59,29 +59,30 @@ exports.handler = async (event) => {
       TableName: SUMMARY_TABLE,
       Item: {
         UserID: { S: userId },           // PK만 있는 테이블 → 덮어쓰기
-        name:   { S: common.name },
-        age:    { N: String(common.age) },
+        name: { S: common.name },
+        age: { N: String(common.age) },
         gender: { S: common.gender },
-        summary:{ S: common.summary },
+        summary: { S: common.summary },
         reaction: { N: String(common.reaction) },
-        memory:   { N: String(common.memory) },
-        numbers:  { N: String(common.numbers) },
+        memory: { N: String(common.memory) },
+        numbers: { N: String(common.numbers) },
         flexibility_correctRate: { N: String(common.flexRate) },
-        flexibility_avgTime:     { N: String(common.flexAvg) },
+        flexibility_avgTime: { N: String(common.flexAvg) },
         updatedAt: { N: String(Date.now()) }
       }
     }));
     return resp(200, { ok: true, where: "summary" });
 
-  } catch (e) {
+  }
+  catch(e){
     console.error(e);
     return resp(500, { error: "Lambda 오류", detail: String(e) });
   }
 };
 
-function resp(code, jsonOrString) {
+function resp(code, jsonOrString){
   const body = typeof jsonOrString === "string" ? jsonOrString : JSON.stringify(jsonOrString);
-  return {
+  return{
     statusCode: code,
     headers: {
       "Access-Control-Allow-Origin": ALLOW_ORIGIN,

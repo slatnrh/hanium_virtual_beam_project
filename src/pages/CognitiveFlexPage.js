@@ -10,11 +10,11 @@ const colorMap = {
   파랑: 'blue',
 };
 
-function getRandomItem(arr) {
+function getRandomItem(arr){
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function CognitiveFlexPage() {
+function CognitiveFlexPage(){
   const [phase, setPhase] = useState('ready'); // ready | question | result
   const [round, setRound] = useState(0);
   const [questionType, setQuestionType] = useState('');
@@ -34,7 +34,7 @@ function CognitiveFlexPage() {
   const startQuestion = () => {
     const word = getRandomItem(colors);
     let color = getRandomItem(colors);
-    while (color === word) {
+    while(color === word){
       color = getRandomItem(colors);
     }
 
@@ -62,10 +62,11 @@ function CognitiveFlexPage() {
 
     setResults((prev) => [...prev, { isCorrect, time: timeTaken }]);
 
-    if (results.length + 1 >= 5) {
+    if(results.length + 1 >= 5){
       setPhase('result');
       setMessage('테스트 완료!');
-    } else {
+    }
+    else{
       setRound((r) => r + 1);
       setPhase('ready');
       setMessage('다음 라운드를 시작하세요');
@@ -73,12 +74,14 @@ function CognitiveFlexPage() {
   };
 
   const handleStart = () => {
-    if (phase === 'ready') {
+    if(phase === 'ready'){
       startQuestion();
-    } else if (phase === 'result') {
-      if (nextTest) {
+    }
+    else if(phase === 'result'){
+      if(nextTest){
         navigate(`/test/${nextTest}`);
-      } else {
+      }
+      else{
         navigate('/result');
       }
     }
@@ -93,20 +96,20 @@ function CognitiveFlexPage() {
     : 0;
 
   useEffect(() => {
-    if (phase === 'result') {
+    if(phase === 'result'){
       const flexibilityResult = { correctRate, avgTime };
       localStorage.setItem("flexibilityResult", JSON.stringify(flexibilityResult));
     }
   }, [phase, correctRate, avgTime]);
 
-  return (
-    <div style={styles.container}>
+  return(
+    <div style = {styles.container}>
       <h2>{message}</h2>
 
       {phase === 'question' && (
         <>
           <div
-            style={{
+            style = {{
               fontSize: '48px',
               fontWeight: 'bold',
               color: colorMap[textColor],
@@ -115,9 +118,9 @@ function CognitiveFlexPage() {
           >
             {textWord}
           </div>
-          <div style={styles.choices}>
+          <div style = {styles.choices}>
             {colors.map((c) => (
-              <button key={c} onClick={() => recordAnswer(c)} style={styles.button}>
+              <button key = {c} onClick={() => recordAnswer(c)} style = {styles.button}>
                 {c}
               </button>
             ))}
@@ -126,16 +129,16 @@ function CognitiveFlexPage() {
       )}
 
       {phase === 'ready' && (
-        <button onClick={handleStart} style={styles.button}>
+        <button onClick = {handleStart} style = {styles.button}>
           {round === 0 ? '시작하기' : '다음 문제'}
         </button>
       )}
 
       {phase === 'result' && (
-        <div style={styles.resultBox}>
+        <div style = {styles.resultBox}>
           <p>정답률: {correctRate}%</p>
           <p>평균 반응 시간: {avgTime}ms</p>
-          <button onClick={handleStart} style={styles.button}>
+          <button onClick = {handleStart} style = {styles.button}>
             {nextTest ? '다음 테스트 ▶' : '결과 보기 ▶'}
           </button>
         </div>

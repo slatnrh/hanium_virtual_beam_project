@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function generateRandomNumber() {
+function generateRandomNumber(){
   return Array.from({ length: 7 }, () => Math.floor(Math.random() * 10)).join('');
 }
 
-function NumberMemoryPage() {
+function NumberMemoryPage(){
   const [phase, setPhase] = useState('ready'); // ready | show | input | review | result
   const [number, setNumber] = useState('');
   const [input, setInput] = useState('');
@@ -31,12 +31,12 @@ function NumberMemoryPage() {
   };
 
   const handleKey = (digit) => {
-    if (phase !== 'input') return;
-    if (input.length < 7) setInput((prev) => prev + digit);
+    if(phase !== 'input') return;
+    if(input.length < 7) setInput((prev) => prev + digit);
   };
 
   const handleBackspace = () => {
-    if (phase === 'input' && input.length > 0) {
+    if(phase === 'input' && input.length > 0){
       setInput((prev) => prev.slice(0, -1));
     }
   };
@@ -50,17 +50,19 @@ function NumberMemoryPage() {
   };
 
   const handleNextRound = () => {
-    if (results.length >= 5) {
+    if(results.length >= 5){
       setPhase('result');
-    } else {
+    }
+    else{
       setPhase('ready');
     }
   };
 
   const handleNextTest = () => {
-    if (nextTest) {
+    if(nextTest){
       navigate(`/test/${nextTest}`);
-    } else {
+    }
+    else{
       navigate('/result');
     }
   };
@@ -70,44 +72,44 @@ function NumberMemoryPage() {
     : 0;
 
   useEffect(() => {
-    if (phase === 'result') {
+    if(phase === 'result'){
       const numbersResult = { correctRate };
       localStorage.setItem("numbersResult", JSON.stringify(numbersResult));
     }
   }, [phase, correctRate]);
 
-  return (
-    <div style={styles.container}>
+  return(
+    <div style = {styles.container}>
       <h2>숫자 기억력 테스트</h2>
 
       {phase === 'ready' && (
-        <button onClick={startRound} style={styles.button}>시작하기</button>
+        <button onClick = {startRound} style = {styles.button}>시작하기</button>
       )}
 
       {phase === 'show' && (
-        <div style={styles.display}>
-          <p style={styles.bigText}>{number}</p>
+        <div style = {styles.display}>
+          <p style = {styles.bigText}>{number}</p>
           <p>5초간 숫자를 기억하세요</p>
         </div>
       )}
 
-      <div style={styles.inputArea}>
-        <div style={{ ...styles.inputBox, visibility: phase === 'input' ? 'visible' : 'hidden' }}>
+      <div style = {styles.inputArea}>
+        <div style = {{ ...styles.inputBox, visibility: phase === 'input' ? 'visible' : 'hidden' }}>
           {input.split('').map((digit, idx) => (
-            <span key={idx} style={styles.inputDigit}>{digit}</span>
+            <span key = {idx} style = {styles.inputDigit}>{digit}</span>
           ))}
         </div>
 
         {(phase === 'input' || phase === 'review') && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-            <div style={styles.keypad}>
+          <div style = {{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+            <div style = {styles.keypad}>
               {[...Array(10).keys()].map((n) => (
-                <button key={n} style={styles.key} onClick={() => handleKey(n.toString())}>
+                <button key = {n} style = {styles.key} onClick = {() => handleKey(n.toString())}>
                   {n}
                 </button>
               ))}
             </div>
-            <button onClick={handleBackspace} style={styles.backspaceButton}>
+            <button onClick = {handleBackspace} style = {styles.backspaceButton}>
               ⬅ 지우기
             </button>
           </div>
@@ -115,32 +117,32 @@ function NumberMemoryPage() {
       </div>
 
       {phase === 'input' && input.length === 7 && (
-        <button style={styles.button} onClick={handleSubmit}>제출</button>
+        <button style = {styles.button} onClick = {handleSubmit}>제출</button>
       )}
 
       {phase === 'review' && (
-        <div style={styles.reviewBox}>
+        <div style = {styles.reviewBox}>
           <h3>결과 확인</h3>
           <p>🟢 정답: <code>{lastAnswer.correct}</code></p>
           <p>🔵 입력: <code>{lastAnswer.user}</code></p>
           <p>{lastAnswer.isCorrect ? '✅ 정답입니다!' : '❌ 틀렸습니다.'}</p>
-          <button onClick={handleNextRound} style={styles.button}>
+          <button onClick = {handleNextRound} style = {styles.button}>
             {results.length >= 5 ? '결과 보기 ▶' : '다음 문제 ▶'}
           </button>
         </div>
       )}
 
       {phase === 'result' && (
-        <div style={styles.resultBox}>
+        <div style = {styles.resultBox}>
           <h3>총 정답률: {correctRate}%</h3>
-          <ul style={{ textAlign: 'left' }}>
+          <ul style = {{ textAlign: 'left' }}>
             {results.map((res, idx) => (
-              <li key={idx} style={{ marginBottom: '10px' }}>
+              <li key = {idx} style = {{ marginBottom: '10px' }}>
                 <strong>{idx + 1}회차</strong> - 정답: <code>{res.correct}</code>, 입력: <code>{res.user}</code> → {res.isCorrect ? '✅ 정답' : '❌ 오답'}
               </li>
             ))}
           </ul>
-          <button onClick={handleNextTest} style={styles.button}>
+          <button onClick = {handleNextTest} style = {styles.button}>
             {nextTest ? '다음 테스트 ▶' : '종합 결과 보기 ▶'}
           </button>
         </div>

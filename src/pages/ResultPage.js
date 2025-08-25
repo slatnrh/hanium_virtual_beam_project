@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function ResultPage() {
+function ResultPage(){
   const navigate = useNavigate();
 
   const selectedTests = JSON.parse(localStorage.getItem("selectedTests") || "[]");
@@ -21,14 +21,14 @@ function ResultPage() {
       selectedTests.includes("flexibility") && flexibility.correctRate >= 70,
     ].filter(Boolean).length;
 
-    if (score === selectedTests.length) return '🟢 매우 우수함';
-    if (score >= selectedTests.length / 2) return '🟡 평균 수준';
+    if(score === selectedTests.length) return '🟢 매우 우수함';
+    if(score >= selectedTests.length / 2) return '🟡 평균 수준';
     return '🔴 주의 필요';
   };
 
   const getUserId = () => {
     let id = localStorage.getItem("userId");
-    if (!id) {
+    if(!id){
       id = crypto.randomUUID(); // 최초 1회 생성
       localStorage.setItem("userId", id);
     }
@@ -57,37 +57,39 @@ function ResultPage() {
         summary: getSummary()
       };
 
-      try {
+      try{
         // 1) 요약 저장 (UserResults에 덮어쓰기)
         const resSummary = await fetch(API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        if (!resSummary.ok) {
+        if(!resSummary.ok){
           const txt = await resSummary.text().catch(() => "");
           throw new Error(`summary save failed: ${resSummary.status} ${txt}`);
         }
         const dataSummary = await resSummary.json();
         console.log("AWS 요약 저장 응답:", dataSummary);
-      } catch (e) {
+      }
+      catch(e){
         console.error("요약 저장 실패:", e);
       }
 
-      try {
+      try{
         // 2) 히스토리 저장 (UserResultsHistory에 누적)
         const resHistory = await fetch(API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...payload, mode: "history" }),
         });
-        if (!resHistory.ok) {
+        if(!resHistory.ok){
           const txt = await resHistory.text().catch(() => "");
           throw new Error(`history save failed: ${resHistory.status} ${txt}`);
         }
         const dataHistory = await resHistory.json();
         console.log("AWS 히스토리 저장 응답:", dataHistory);
-      } catch (e) {
+      }
+      catch(e){
         console.error("히스토리 저장 실패:", e);
       }
     };
@@ -101,44 +103,44 @@ function ResultPage() {
     navigate('/');
   };
 
-  return (
-    <div style={styles.container}>
+  return(
+    <div style = {styles.container}>
       <h1>테스트 결과 분석</h1>
 
       {selectedTests.includes("reaction") && (
-        <div style={styles.resultCard}>
+        <div style = {styles.resultCard}>
           <h2>1. 인지 속도</h2>
           <p>평균 반응속도: {reaction.avgTime ?? '-'}ms</p>
         </div>
       )}
 
       {selectedTests.includes("memory") && (
-        <div style={styles.resultCard}>
+        <div style = {styles.resultCard}>
           <h2>2. 공간 기억력</h2>
           <p>정답률: {memory.correctRate ?? '-'}%</p>
         </div>
       )}
 
       {selectedTests.includes("numbers") && (
-        <div style={styles.resultCard}>
+        <div style = {styles.resultCard}>
           <h2>3. 숫자 기억력</h2>
           <p>정답률: {numbers.correctRate ?? '-'}%</p>
         </div>
       )}
 
       {selectedTests.includes("flexibility") && (
-        <div style={styles.resultCard}>
+        <div style = {styles.resultCard}>
           <h2>4. 인지 전환 유연성</h2>
           <p>정답률: {flexibility.correctRate ?? '-'}%</p>
           <p>평균 반응 시간: {flexibility.avgTime ?? '-'}ms</p>
         </div>
       )}
 
-      <div style={styles.summary}>
+      <div style = {styles.summary}>
         <h2>🧠 종합 수행 능력: {getSummary()}</h2>
       </div>
 
-      <button onClick={handleRestart} style={styles.button}>
+      <button onClick = {handleRestart} style = {styles.button}>
         다시 시작하기 🔄
       </button>
     </div>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function TestSelectPage() {
+function TestSelectPage(){
   const navigate = useNavigate();
   const [selectedTests, setSelectedTests] = useState([]);
 
@@ -19,29 +19,36 @@ function TestSelectPage() {
     );
   };
 
+  const PRIORITY = {
+    reaction: 1,
+    memory: 2,
+    numbers: 3,
+    flexibility: 4,
+  };
+
   const handleNext = () => {
-    if (selectedTests.length === 0) {
+    if(selectedTests.length === 0){
       alert('최소 하나 이상의 테스트를 선택해주세요!');
       return;
     }
 
-    localStorage.setItem('selectedTests', JSON.stringify(selectedTests));
+    const ordered = [...selectedTests].sort((a, b) => PRIORITY[a] - PRIORITY[b]);
 
-    // 첫 번째 선택된 테스트로 이동
-    const firstTest = selectedTests[0];
-    navigate(`/test/${firstTest}`);
+    localStorage.setItem('selectedTests', JSON.stringify(ordered));
+
+    navigate(`/test/${ordered[0]}`);
   };
 
-  return (
-    <div style={styles.container}>
+  return(
+    <div style = {styles.container}>
       <h1>진행할 테스트를 선택하세요</h1>
-      <div style={styles.list}>
+      <div style = {styles.list}>
         {testOptions.map((test) => (
           <button
-            key={test.id}
-            onClick={() => toggleSelection(test.id)}
-            aria-pressed={selectedTests.includes(test.id)}
-            style={{
+            key = {test.id}
+            onClick = {() => toggleSelection(test.id)}
+            aria-pressed = {selectedTests.includes(test.id)}
+            style = {{
               ...styles.testButton,
               backgroundColor: selectedTests.includes(test.id)
                 ? '#4CAF50'
@@ -54,7 +61,7 @@ function TestSelectPage() {
         ))}
       </div>
 
-      <button onClick={handleNext} style={styles.nextButton}>
+      <button onClick = {handleNext} style = {styles.nextButton}>
         다음 ▶
       </button>
     </div>

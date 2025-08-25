@@ -8,17 +8,17 @@ import NumberMemoryPage from './pages/NumberMemoryPage';
 import CognitiveFlexPage from './pages/CognitiveFlexPage';
 import ResultPage from './pages/ResultPage';
 
-function App() {
-  return (
+function App(){
+  return(
     <Router>
       <Routes>
-        <Route path="/" element={<UserFormPage />} />
-        <Route path="/select" element={<TestSelectPage />} />
-        <Route path="/test/reaction" element={<ReactionTestPage />} />
-        <Route path="/test/memory" element={<SpatialMemoryPage />} />
-        <Route path="/test/numbers" element={<NumberMemoryPage />} />
-        <Route path="/test/flexibility" element={<CognitiveFlexPage />} />
-        <Route path="/result" element={<ResultPage />} />
+        <Route path = "/" element = {<UserFormPage />} />
+        <Route path = "/select" element = {<TestSelectPage />} />
+        <Route path = "/test/reaction" element = {<ReactionTestPage />} />
+        <Route path = "/test/memory" element = {<SpatialMemoryPage />} />
+        <Route path = "/test/numbers" element = {<NumberMemoryPage />} />
+        <Route path = "/test/flexibility" element = {<CognitiveFlexPage />} />
+        <Route path = "/result" element = {<ResultPage />} />
       </Routes>
     </Router>
   );

@@ -19,7 +19,7 @@ function ReactionTestPage(){
     : 0;
 
   useEffect(() => {
-    if (status === 'waiting') {
+    if(status === 'waiting'){
       const delay = Math.floor(Math.random() * 2000) + 2000;
       setMessage('초록색으로 바뀌면 클릭하세요...');
       const timer = setTimeout(() => {
@@ -31,71 +31,76 @@ function ReactionTestPage(){
   }, [status]);
 
   useEffect(() => {
-    if (status === 'result') {
+    if(status === 'result'){
       const reactionResult = { avgTime: average };
       localStorage.setItem('reactionResult', JSON.stringify(reactionResult));
     }
   }, [status, average]);
 
   const handleClick = () => {
-    if (status === 'ready') {
+    if(status === 'ready'){
       setResults([]);
       setStatus('waiting');
-    } else if (status === 'waiting') {
+    }
+    else if(status === 'waiting'){
       setMessage('너무 빨랐어요! 다시 시도하세요.');
       setStatus('ready');
-    } else if (status === 'go') {
+    }
+    else if(status === 'go'){
       const reactionTime = Date.now() - startTime;
       const newResults = [...results, reactionTime];
       setResults(newResults);
 
-      if (newResults.length >= 5) {
+      if(newResults.length >= 5){
         setStatus('result');
         setMessage('완료! 결과를 확인하세요.');
-      } else {
+      }
+      else{
         setStatus('waiting');
       }
-    } else if (status === 'result') {
-      if (nextTest) {
+    }
+    else if(status === 'result') {
+      if(nextTest){
         navigate(`/test/${nextTest}`);
-      } else {
+      }
+      else{
         navigate('/result');
       }
     }
   };
 
   const getBackgroundColor = () => {
-    if (status === 'waiting') return '#e74c3c';
-    if (status === 'go') return '#2ecc71';
+    if(status === 'waiting') return '#e74c3c';
+    if(status === 'go') return '#2ecc71';
     return '#bdc3c7';
   };
 
-  return (
+  return(
     <div
-      onClick={handleClick}
-      onTouchStart={handleClick}
-      style={{
+      onClick = {handleClick}
+      onTouchStart = {handleClick}
+      style = {{
         ...styles.container,
         backgroundColor: getBackgroundColor(),
       }}
     >
       <h2>{message}</h2>
       {status === 'result' && (
-        <div style={styles.resultBox}>
+        <div style = {styles.resultBox}>
           <h3>반응속도 결과</h3>
           <ul>
             {results.map((time, i) => (
-              <li key={i}>{i + 1}회차: {time}ms</li>
+              <li key = {i}>{i + 1}회차: {time}ms</li>
             ))}
           </ul>
           <p>평균 반응속도: <strong>{average}ms</strong></p>
-          <button onClick={handleClick} style={styles.button}>
+          <button onClick = {handleClick} style = {styles.button}>
             {nextTest ? '다음 테스트 ▶' : '결과 보기 ▶'}
           </button>
         </div>
       )}
       {status === 'ready' && (
-        <button style={styles.button}>시작하기</button>
+        <button style = {styles.button}>시작하기</button>
       )}
     </div>
   );

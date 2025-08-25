@@ -38,7 +38,8 @@ wss_jetson.on('connection', (ws) => {
         if(typeof data.x === 'number' && typeof data.y === 'number' && typeof data.click === 'boolean'){
             LatestData = data;
         }
-    } catch(e){
+    }
+    catch(e){
         console.error("데이터 파싱 에러:", e);
     }
   });
