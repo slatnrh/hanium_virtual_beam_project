@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 function UserFormPage(){
   const [age, setAge] = useState('');      // 숫자 키패드로만 입력
   const [gender, setGender] = useState('');
+  const [phone, setPhone] = useState('');
   const navigate = useNavigate();
 
   const appendDigit = (d) => {
@@ -18,8 +19,8 @@ function UserFormPage(){
   const clearAll = () => setAge('');
 
   const handleNext = () => {
-    if(!age || !gender){
-      alert('나이와 성별을 입력해주세요!');
+    if(!age || !gender || !phone){
+      alert('나이, 성별, 전화번호를 모두 입력해주세요!');
       return;
     }
     const ageNum = Number(age);
@@ -27,8 +28,14 @@ function UserFormPage(){
       alert('유효한 나이를 입력해주세요! (1~120)');
       return;
     }
+    
+    const onlyDigits = phone.replace(/\D/g, '');
+    if(onlyDigits.length < 10 || onlyDigits.length > 11){
+      alert('전화번호를 10~11자리 숫자로 입력해주세요.');
+      return;
+    }
 
-    localStorage.setItem('userInfo', JSON.stringify({ age: ageNum, gender }));
+    localStorage.setItem('userInfo', JSON.stringify({ age: ageNum, gender, phone: onlyDigits }));
 
     navigate('/select');
   };
@@ -79,6 +86,18 @@ function UserFormPage(){
         <option value = "여성">여성</option>
         <option value = "기타">기타</option>
       </select>
+
+      <label style = {styles.label}>전화번호</label>
+      <input
+        type = "tel"
+        value = {phone}
+        onChange = {(e) => {
+          const v = e.target.value.replace(/\D/g, '').slice(0, 11);
+          setPhone(v);
+        }}
+        placeholder = '예: 01012345678'
+        style = {styles.input}
+      />
 
       <button onClick = {handleNext} style = {styles.button}>
         다음 ▶

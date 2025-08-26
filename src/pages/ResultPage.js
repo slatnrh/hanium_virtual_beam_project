@@ -60,7 +60,11 @@ function ResultPage(){
       numbers,
       flexibility,
       summary: getSummary(),
-      userInfo
+      userInfo: {
+        age: Number(userInfo.age ?? 0),
+        gender: userInfo.gender ?? "unknown",
+        phone: userInfo.phone ?? ""
+      }
     };
 
     const payload = {
