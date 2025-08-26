@@ -3,47 +3,53 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function UserFormPage(){
-  const [age, setAge] = useState('');      // 숫자 키패드로만 입력
+  const [age, setAge] = useState('');      // 숫자 키패드만
   const [gender, setGender] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('');  // 숫자 키패드만
+
   const navigate = useNavigate();
 
-  const appendDigit = (d) => {
-    // 최대 3자리(0~120 같은 범용 연령을 고려). 앞자리 '0' 방지
-    if(age.length >= 3) return;
-    if(age === '' && d === '0') return;
+  // --- 나이(Keypad) ---
+  const appendAgeDigit = (d) => {
+    if(age.length >= 3) return;           // 최대 3자리
+    if(age === '' && d === '0') return;   // 앞자리 0 방지
     setAge((prev) => prev + d);
   };
+  const ageBackspace = () => setAge((prev) => prev.slice(0, -1));
+  const clearAge = () => setAge('');
 
+  // --- 전화(Keypad) ---
   const appendPhoneDigit = (d) => {
-    if(phone.length >= 11) return;
-    if(phone === '' && d === '0') return;
+    if(phone.length >= 11) return;        // 최대 11자리
+    // 전화는 맨 앞 '0' 허용 (010~)
     setPhone((prev) => prev + d);
-  }
+  };
   const phoneBackspace = () => setPhone((prev) => prev.slice(0, -1));
   const clearPhone = () => setPhone('');
-
-  const backspace = () => setAge((prev) => prev.slice(0, -1));
-  const clearAll = () => setAge('');
 
   const handleNext = () => {
     if(!age || !gender || !phone){
       alert('나이, 성별, 전화번호를 모두 입력해주세요!');
       return;
     }
+
     const ageNum = Number(age);
     if(Number.isNaN(ageNum) || ageNum <= 0 || ageNum > 120){
       alert('유효한 나이를 입력해주세요! (1~120)');
       return;
     }
-    
+
     const onlyDigits = phone.replace(/\D/g, '');
     if(onlyDigits.length < 10 || onlyDigits.length > 11){
       alert('전화번호를 10~11자리 숫자로 입력해주세요.');
       return;
     }
 
-    localStorage.setItem('userInfo', JSON.stringify({ age: ageNum, gender, phone: onlyDigits }));
+    localStorage.setItem('userInfo', JSON.stringify({
+      age: ageNum,
+      gender,
+      phone: onlyDigits
+    }));
 
     navigate('/select');
   };
@@ -61,15 +67,14 @@ function UserFormPage(){
         placeholder = "숫자 키패드로 입력"
         style = {{ ...styles.input, textAlign: 'center', fontSize: 22, letterSpacing: 1 }}
       />
-
-      <div style={styles.keypad}>
+      <div style = {styles.keypad}>
         {['1','2','3','4','5','6','7','8','9','⌫','0','전체 지우기'].map((key) => (
           <button
-            key = {key}
+            key = {`age-${key}`}
             onClick = {() => {
-              if(key === '⌫') phoneBackspace();
-              else if(key === '전체 지우기') clearPhone();
-              else appendPhoneDigit(key);
+              if(key === '⌫') ageBackspace();
+              else if(key === '전체 지우기') clearAge();
+              else appendAgeDigit(key);
             }}
             style = {{
               ...styles.key,
@@ -95,17 +100,37 @@ function UserFormPage(){
         <option value = "기타">기타</option>
       </select>
 
-      <label style={styles.label}>전화번호</label>
+      <label style = {styles.label}>전화번호</label>
       <input
-        type="text"
-        value={phone}
+        type = "text"
+        value = {phone}
         readOnly
-        inputMode="none"
-        placeholder="숫자 키패드로 입력"
-        style={{ ...styles.input, textAlign: 'center', fontSize: 22, letterSpacing: 1 }}
+        inputMode = "none"
+        placeholder = "숫자 키패드로 입력"
+        style = {{ ...styles.input, textAlign: 'center', fontSize: 22, letterSpacing: 1 }}
       />
+      <div style = {styles.keypad}>
+        {['1','2','3','4','5','6','7','8','9','⌫','0','전체 지우기'].map((key) => (
+          <button
+            key = {`phone-${key}`}
+            onClick = {() => {
+              if(key === '⌫') phoneBackspace();
+              else if(key === '전체 지우기') clearPhone();
+              else appendPhoneDigit(key);
+            }}
+            style = {{
+              ...styles.key,
+              gridColumn: key === '전체 지우기' ? 'span 2' : 'auto',
+              backgroundColor: key === '⌫' ? '#FFD166' : key === '전체 지우기' ? '#EF476F' : '#ffffff',
+              color: key === '전체 지우기' ? '#ffffff' : '#333',
+            }}
+          >
+            {key}
+          </button>
+        ))}
+      </div>
 
-      <button onClick = {handleNext} style = {styles.button}>
+      <button onClick = {handleNext} style={styles.button}>
         다음 ▶
       </button>
     </div>
