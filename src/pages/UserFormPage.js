@@ -15,6 +15,14 @@ function UserFormPage(){
     setAge((prev) => prev + d);
   };
 
+  const appendPhoneDigit = (d) => {
+    if(phone.length >= 11) return;
+    if(phone === '' && d === '0') return;
+    setPhone((prev) => prev + d);
+  }
+  const phoneBackspace = () => setPhone((prev) => prev.slice(0, -1));
+  const clearPhone = () => setPhone('');
+
   const backspace = () => setAge((prev) => prev.slice(0, -1));
   const clearAll = () => setAge('');
 
@@ -49,19 +57,19 @@ function UserFormPage(){
         type = "text"
         value = {age}
         readOnly
-        inputMode="none"
-        placeholder="숫자 키패드로 입력"
+        inputMode = "none"
+        placeholder = "숫자 키패드로 입력"
         style = {{ ...styles.input, textAlign: 'center', fontSize: 22, letterSpacing: 1 }}
       />
 
-      <div style = {styles.keypad}>
+      <div style={styles.keypad}>
         {['1','2','3','4','5','6','7','8','9','⌫','0','전체 지우기'].map((key) => (
           <button
             key = {key}
             onClick = {() => {
-              if(key === '⌫') backspace();
-              else if(key === '전체 지우기') clearAll();
-              else appendDigit(key);
+              if(key === '⌫') phoneBackspace();
+              else if(key === '전체 지우기') clearPhone();
+              else appendPhoneDigit(key);
             }}
             style = {{
               ...styles.key,
@@ -87,16 +95,14 @@ function UserFormPage(){
         <option value = "기타">기타</option>
       </select>
 
-      <label style = {styles.label}>전화번호</label>
+      <label style={styles.label}>전화번호</label>
       <input
-        type = "tel"
-        value = {phone}
-        onChange = {(e) => {
-          const v = e.target.value.replace(/\D/g, '').slice(0, 11);
-          setPhone(v);
-        }}
-        placeholder = '예: 01012345678'
-        style = {styles.input}
+        type="text"
+        value={phone}
+        readOnly
+        inputMode="none"
+        placeholder="숫자 키패드로 입력"
+        style={{ ...styles.input, textAlign: 'center', fontSize: 22, letterSpacing: 1 }}
       />
 
       <button onClick = {handleNext} style = {styles.button}>
